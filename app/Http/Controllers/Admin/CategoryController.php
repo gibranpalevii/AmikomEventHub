@@ -9,10 +9,16 @@ use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-    // Menampilkan semua kategori
-    public function index()
+    // Menampilkan semua kategori + search
+    public function index(Request $request)
     {
-        $categories = Category::latest()->get();
+        $search = $request->search;
+
+        $categories = Category::when($search, function ($query) use ($search) {
+
+            $query->where('name', 'LIKE', '%' . $search . '%');
+
+        })->latest()->get();
 
         return view('admin.categories.index', compact('categories'));
     }
@@ -29,16 +35,9 @@ class CategoryController extends Controller
             'slug' => Str::slug($request->name)
         ]);
 
-        return redirect()->route('admin.categories.index')
+        return redirect()
+            ->route('admin.categories.index')
             ->with('success', 'Kategori berhasil ditambahkan');
-    }
-
-    // Form edit kategori
-    public function edit($id)
-    {
-        $category = Category::findOrFail($id);
-
-        return view('admin.categories.edit', compact('category'));
     }
 
     // Update kategori
@@ -55,7 +54,8 @@ class CategoryController extends Controller
             'slug' => Str::slug($request->name)
         ]);
 
-        return redirect()->route('admin.categories.index')
+        return redirect()
+            ->route('admin.categories.index')
             ->with('success', 'Kategori berhasil diupdate');
     }
 
@@ -66,7 +66,8 @@ class CategoryController extends Controller
 
         $category->delete();
 
-        return redirect()->route('admin.categories.index')
+        return redirect()
+            ->route('admin.categories.index')
             ->with('success', 'Kategori berhasil dihapus');
     }
 }
