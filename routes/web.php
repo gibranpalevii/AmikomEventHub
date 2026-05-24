@@ -15,22 +15,14 @@ use App\Http\Controllers\Admin\PartnerController;
 |--------------------------------------------------------------------------
 */
 
+// Homepage
 Route::get('/', [HomeController::class, 'index'])
     ->name('home');
 
-/*
-|--------------------------------------------------------------------------
-| Detail Event
-|--------------------------------------------------------------------------
-*/
-
+// Detail Event
 Route::get('/event/{id}', function ($id) {
 
-    return "
-        <h1 style='font-family:sans-serif'>
-            Detail Event ID: {$id}
-        </h1>
-    ";
+    return view('event-detail');
 
 })->name('events.show');
 
