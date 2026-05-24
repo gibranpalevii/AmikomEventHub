@@ -1,13 +1,23 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+
 class Event extends Model
 {
-    // ...
-    // ... ($fillable kalian dari pertemuan lalu biarkan tidak diubah) 
+    protected $fillable = [
+        'category_id',
+        'title',
+        'description',
+        'date',
+        'location',
+        'price',
+        'stock',
+        'image'
+    ];
 
-    // Menandakan atribut: 1 Event harus terpaut pada satu wujud Kategori
+    // Relasi ke kategori
     public function category()
     {
         return $this->belongsTo(Category::class);
