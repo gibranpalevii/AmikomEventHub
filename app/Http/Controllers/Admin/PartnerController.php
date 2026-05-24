@@ -16,7 +16,9 @@ class PartnerController extends Controller
         $search = $request->search;
 
         $partners = Partner::when($search, function ($query) use ($search) {
+
             $query->where('name', 'LIKE', '%' . $search . '%');
+
         })->latest()->get();
 
         return view('admin.partners.index', compact('partners'));
@@ -48,14 +50,15 @@ class PartnerController extends Controller
             'logo_url' => $logo
         ]);
 
-        return redirect()->route('admin.partners.index')
+        return redirect()
+            ->route('admin.partners.index')
             ->with('success', 'Partner berhasil ditambahkan');
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'name' => 'required',
@@ -64,7 +67,9 @@ class PartnerController extends Controller
 
         $partner = Partner::findOrFail($id);
 
-        $logo = $partner->logo_url;
+        $data = [
+            'name' => $request->name
+        ];
 
         if ($request->hasFile('logo_url')) {
 
@@ -73,27 +78,28 @@ class PartnerController extends Controller
             $logo = time() . '_' . $file->getClientOriginalName();
 
             $file->move(public_path('uploads/partners'), $logo);
+
+            $data['logo_url'] = $logo;
         }
 
-        $partner->update([
-            'name' => $request->name,
-            'logo_url' => $logo
-        ]);
+        $partner->update($data);
 
-        return redirect()->route('admin.partners.index')
+        return redirect()
+            ->route('admin.partners.index')
             ->with('success', 'Partner berhasil diupdate');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
         $partner = Partner::findOrFail($id);
 
         $partner->delete();
 
-        return redirect()->route('admin.partners.index')
+        return redirect()
+            ->route('admin.partners.index')
             ->with('success', 'Partner berhasil dihapus');
     }
 }
