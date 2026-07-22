@@ -2,18 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Partner;
+use App\Models\Event;
 use App\Models\Category;
+use App\Models\Partner;
+use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $partners = Partner::latest()->get();
+        $categories = Category::all();
 
-        $categories = Category::latest()->get();
+        $partners = Partner::all();
 
-        return view('welcome', compact('partners', 'categories'));
+        $events = Event::with(['category', 'organization'])
+            ->when($request->category, function ($query) use ($request) {
+
+                $query->whereHas('category', function ($q) use ($request) {
+                    $q->where('slug', $request->category);
+                });
+
+            })
+            ->latest()
+            ->get();
+
+        return view('welcome', compact(
+            'events',
+            'categories',
+            'partners'
+        ));
     }
 }

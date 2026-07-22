@@ -1,5 +1,9 @@
 @extends('layouts.admin')
 
+@php
+use Illuminate\Support\Facades\Storage;
+@endphp
+
 @section('title', 'Kelola Event - Admin')
 
 @section('page_title', 'Kelola Event')
@@ -16,6 +20,7 @@
         active:scale-95 transition">
 
         + Tambah Event Baru
+
     </a>
 
 </div>
@@ -56,7 +61,11 @@
 
                         <td class="px-8 py-6">
 
-                            <img src="https://placehold.co/16x20"
+                            <img
+                                src="{{ ($event->poster_path && Storage::disk('public')->exists($event->poster_path))
+                                    ? asset('storage/' . $event->poster_path)
+                                    : 'https://placehold.co/160x200' }}"
+                                alt="{{ $event->title }}"
                                 class="w-16 h-20 rounded-xl object-cover shadow-sm">
 
                         </td>
@@ -70,7 +79,7 @@
                             <p class="text-xs text-slate-400">
                                 {{ $event->category->name ?? '-' }}
                                 •
-                                {{ $event->date }}
+                                {{ \Carbon\Carbon::parse($event->date)->format('d M Y H:i') }}
                             </p>
 
                         </td>
@@ -91,7 +100,7 @@
 
                             <div class="flex gap-2">
 
-                                <!-- BUTTON EDIT -->
+                                <!-- EDIT -->
                                 <a href="{{ route('admin.events.edit', $event->id) }}"
                                     class="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl
                                     hover:bg-indigo-600 hover:text-white transition">
@@ -104,17 +113,14 @@
                                         <path stroke-linecap="round"
                                             stroke-linejoin="round"
                                             stroke-width="2"
-                                            d="M11 5h2a2 2 0
-                                            012 2v2m-2-2L6
-                                            14v4h4l7-7m-6-6l6
-                                            6">
+                                            d="M11 5h2a2 2 0 012 2v2m-2-2L6 14v4h4l7-7m-6-6l6 6">
                                         </path>
 
                                     </svg>
 
                                 </a>
 
-                                <!-- BUTTON DELETE -->
+                                <!-- DELETE -->
                                 <form action="{{ route('admin.events.destroy', $event->id) }}"
                                     method="POST"
                                     onsubmit="return confirm('Apakah Anda yakin ingin menghapus acara ini?');">
@@ -175,7 +181,7 @@
 
     </div>
 
-    <div class="px-8 py-6 bg-slate-50/50 border-t items-center">
+    <div class="px-8 py-6 bg-slate-50/50 border-t">
 
         {{ $events->links() }}
 

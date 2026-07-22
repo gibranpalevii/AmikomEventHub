@@ -11,7 +11,27 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+
+        /*
+        |--------------------------------------------------------------------------
+        | Middleware Alias
+        |--------------------------------------------------------------------------
+        */
+
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | CSRF Exception
+        |--------------------------------------------------------------------------
+        | Mengecualikan webhook Midtrans agar tidak terkena Error 419
+        */
+
+        $middleware->validateCsrfTokens(except: [
+            '/midtrans/callback',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
